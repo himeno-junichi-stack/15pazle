@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIアニメ画像スライディングパズル</title>
+    <title>マイフォト・スライディングパズル</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .puzzle-board {
@@ -37,65 +37,66 @@
         }
     </style>
 </head>
-<body class="bg-pink-50 min-h-screen flex flex-col items-center py-8 px-4 font-sans">
+<body class="bg-blue-50 min-h-screen flex flex-col items-center py-8 px-4 font-sans">
 
-    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 border-t-4 border-pink-400">
-        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">アニメキャラパズル</h1>
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 border-t-4 border-blue-400">
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">マイフォトパズル</h1>
 
         <div class="flex flex-col gap-4 mb-6">
             <div class="flex justify-between items-center">
                 <label class="font-medium text-gray-700">グリッドサイズ:</label>
-                <select id="gridSize" class="bg-gray-50 border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-pink-300 outline-none">
+                <select id="gridSize" class="bg-gray-50 border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-300 outline-none">
                     <option value="3">3 x 3</option>
                     <option value="4" selected>4 x 4</option>
                     <option value="5">5 x 5</option>
                 </select>
             </div>
             
-            <div class="flex gap-2">
-                <button id="generateBtn" class="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded transition shadow-md">
-                    新しいキャラを生成
+            <div class="flex flex-col gap-2">
+                <!-- ファイル選択用の隠しinput -->
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+                <button id="selectBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition shadow-md flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                    </svg>
+                    写真を選択する
                 </button>
-                <button id="autoSolveBtn" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition shadow-md">
+                <button id="autoSolveBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition shadow-md btn-disabled">
                     自動で解く
                 </button>
             </div>
         </div>
 
         <div class="flex justify-around mb-4 text-sm font-semibold text-gray-600">
-            <div>移動回数: <span id="moveCount" class="text-pink-600">0</span></div>
-            <div id="status">準備完了</div>
+            <div>移動回数: <span id="moveCount" class="text-blue-600">0</span></div>
+            <div id="status">画像を選んでね</div>
         </div>
 
         <div class="relative">
+            <!-- パズルボード -->
             <div id="puzzleBoard" class="puzzle-board mx-auto w-full aspect-square hidden"></div>
             
-            <div id="loading" class="hidden absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
-                <div class="flex flex-col items-center">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mb-2"></div>
-                    <p class="text-pink-600 font-bold">描き込み中...</p>
-                </div>
-            </div>
-            
-            <div id="winMsg" class="hidden absolute inset-0 flex items-center justify-center bg-pink-400 bg-opacity-40 rounded z-20 transition-all duration-500">
+            <!-- 勝利メッセージ -->
+            <div id="winMsg" class="hidden absolute inset-0 flex items-center justify-center bg-blue-400 bg-opacity-40 rounded z-20 transition-all duration-500">
                 <div class="text-center text-white p-6">
-                    <p class="text-4xl font-bold mb-2 shadow-text">コンプリート！</p>
-                    <p class="mb-4 font-bold shadow-text">完璧なイラストになりました！</p>
-                    <button id="replayBtn" class="bg-white text-pink-600 px-6 py-2 rounded-full font-bold shadow-xl hover:bg-pink-50 transition transform hover:scale-105">もう一度遊ぶ</button>
+                    <p class="text-4xl font-bold mb-2 shadow-text">完成！</p>
+                    <p class="mb-4 font-bold shadow-text">素晴らしい写真ですね！</p>
+                    <button id="replayBtn" class="bg-white text-blue-600 px-6 py-2 rounded-full font-bold shadow-xl hover:bg-blue-50 transition transform hover:scale-105">もう一度遊ぶ</button>
                 </div>
             </div>
         </div>
 
         <div class="mt-6 flex gap-2">
-            <button id="hintBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200">
+            <button id="hintBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 btn-disabled">
                 完成図を見る
             </button>
-            <button id="shuffleBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200">
+            <button id="shuffleBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 btn-disabled">
                 シャッフル
             </button>
         </div>
     </div>
 
+    <!-- ヒントモーダル -->
     <div id="hintModal" class="hidden fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
         <div class="bg-white p-2 rounded-lg max-w-sm w-full relative shadow-2xl">
             <button id="closeHint" class="absolute -top-10 right-0 text-white text-xl font-bold flex items-center gap-1">
@@ -106,7 +107,6 @@
     </div>
 
     <script>
-        const apiKey = "";
         let gridSize = 4;
         let tiles = [];
         let currentImgUrl = "";
@@ -117,71 +117,37 @@
         const boardEl = document.getElementById('puzzleBoard');
         const moveCountEl = document.getElementById('moveCount');
         const statusEl = document.getElementById('status');
-        const loadingEl = document.getElementById('loading');
         const winMsgEl = document.getElementById('winMsg');
         const hintModal = document.getElementById('hintModal');
         const hintImage = document.getElementById('hintImage');
         const autoSolveBtn = document.getElementById('autoSolveBtn');
-        const generateBtn = document.getElementById('generateBtn');
+        const selectBtn = document.getElementById('selectBtn');
+        const imageInput = document.getElementById('imageInput');
         const shuffleBtn = document.getElementById('shuffleBtn');
+        const hintBtn = document.getElementById('hintBtn');
 
-        // ジャンル別のプロンプト設定 (よりかわいく高品質に)
-        const animePrompts = [
-            "Extremely cute anime girl wearing a stylish swimsuit at the beach, summer sunlight, sparkling ocean background, vibrant colors, soft shading, big expressive eyes, smiling, kawaii aesthetic, masterpiece, high quality anime art",
-            "Adorable anime girl in a Japanese school gym uniform (buruma style), athletic pose in a sunny gymnasium, cute pigtails, blush on cheeks, innocent look, detailed textures, vibrant and soft colors, masterpiece",
-            "Beautiful anime girl wearing a cute white summer dress (one-piece), straw hat, sunflower field background, gentle breeze, soft cinematic lighting, elegant and kawaii, high resolution anime illustration",
-            "Cute anime girl dressed as a Japanese shrine maiden (Miko), traditional red and white outfit, sakura petals falling, mystical shrine background, big sparkling eyes, elegant yet adorable, masterpiece art",
-            "Kawaii anime girl relaxing in a Japanese hot spring (Onsen), steam rising, traditional stone bath, beautiful scenery background, towel on head, rosy cheeks from the heat, peaceful and cute expression, high quality anime style"
-        ];
+        // ファイルが選択された時の処理
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        async function fetchWithRetry(url, options, maxRetries = 5) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url, options);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return await response.json();
-                } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-        }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                currentImgUrl = event.target.result;
+                hintImage.src = currentImgUrl;
+                
+                // ボタン類を有効化
+                autoSolveBtn.classList.remove('btn-disabled');
+                shuffleBtn.classList.remove('btn-disabled');
+                hintBtn.classList.remove('btn-disabled');
+                
+                initGame();
+            };
+            reader.readAsDataURL(file);
+        });
 
-        async function generateImage() {
-            if (isAutoSolving) return;
-            loadingEl.classList.remove('hidden');
-            statusEl.textContent = "キャラを生成中...";
-            
-            const randomPrompt = animePrompts[Math.floor(Math.random() * animePrompts.length)];
-
-            try {
-                const result = await fetchWithRetry(
-                    `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`, 
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            instances: [{ prompt: randomPrompt }],
-                            parameters: { sampleCount: 1 }
-                        })
-                    }
-                );
-
-                if (result && result.predictions && result.predictions[0]) {
-                    currentImgUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
-                    hintImage.src = currentImgUrl;
-                    initGame();
-                } else {
-                    throw new Error("Invalid response format from API");
-                }
-            } catch (error) {
-                console.error("Image generation error:", error);
-                statusEl.textContent = "生成エラー。再試行してください。";
-            } finally {
-                loadingEl.classList.add('hidden');
-            }
-        }
+        // ボタンクリックでinputをクリック
+        selectBtn.onclick = () => imageInput.click();
 
         function initGame() {
             gridSize = parseInt(document.getElementById('gridSize').value);
@@ -191,9 +157,6 @@
             isAutoSolving = false;
             winMsgEl.classList.add('hidden');
             boardEl.classList.remove('hidden');
-            autoSolveBtn.classList.remove('btn-disabled');
-            generateBtn.classList.remove('btn-disabled');
-            shuffleBtn.classList.remove('btn-disabled');
             
             boardEl.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
             
@@ -216,14 +179,12 @@
         function shuffleTiles() {
             let emptyIdx = tiles.length - 1;
             const iterations = gridSize * gridSize * 30;
-
             for (let i = 0; i < iterations; i++) {
                 const neighbors = getNeighbors(emptyIdx);
                 const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
                 swapTilesByCurrentPos(emptyIdx, randomNeighbor);
                 emptyIdx = randomNeighbor;
             }
-            
             tiles.sort((a, b) => a.currentPos - b.currentPos);
         }
 
@@ -231,12 +192,10 @@
             const neighbors = [];
             const row = Math.floor(idx / gridSize);
             const col = idx % gridSize;
-
             if (row > 0) neighbors.push(idx - gridSize);
             if (row < gridSize - 1) neighbors.push(idx + gridSize);
             if (col > 0) neighbors.push(idx - 1);
             if (col < gridSize - 1) neighbors.push(idx + 1);
-            
             return neighbors;
         }
 
@@ -245,7 +204,6 @@
             tiles.forEach((tile, index) => {
                 const div = document.createElement('div');
                 div.className = `tile aspect-square ${tile.isEmpty ? 'empty' : ''} border border-white/20`;
-                
                 if (!tile.isEmpty) {
                     div.style.backgroundImage = `url(${currentImgUrl})`;
                     div.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
@@ -253,7 +211,6 @@
                     const col = tile.id % gridSize;
                     div.style.backgroundPosition = `${(col / (gridSize - 1)) * 100}% ${(row / (gridSize - 1)) * 100}%`;
                 }
-                
                 div.onclick = () => { if (!isAutoSolving) handleTileClick(index); };
                 boardEl.appendChild(div);
             });
@@ -276,7 +233,6 @@
             const clickedCol = index % gridSize;
             const emptyRow = Math.floor(emptyIndex / gridSize);
             const emptyCol = emptyIndex % gridSize;
-
             const isAdjacent = (Math.abs(clickedRow - emptyRow) === 1 && clickedCol === emptyCol) ||
                                (Math.abs(clickedCol - emptyCol) === 1 && clickedRow === emptyRow);
 
@@ -286,7 +242,6 @@
                 const tempPos = tileAtClicked.currentPos;
                 tileAtClicked.currentPos = tileAtEmpty.currentPos;
                 tileAtEmpty.currentPos = tempPos;
-                
                 tiles.sort((a, b) => a.currentPos - b.currentPos);
                 moves++;
                 moveCountEl.textContent = moves;
@@ -296,20 +251,18 @@
         }
 
         async function autoSolve() {
-            if (isWon || isAutoSolving) return;
+            if (isWon || isAutoSolving || !currentImgUrl) return;
             isAutoSolving = true;
             autoSolveBtn.classList.add('btn-disabled');
-            generateBtn.classList.add('btn-disabled');
+            selectBtn.classList.add('btn-disabled');
             shuffleBtn.classList.add('btn-disabled');
             statusEl.textContent = "AIが解いています...";
-
             while (!isWon && isAutoSolving) {
                 const targetTile = tiles.find(t => t.id !== t.currentPos && !t.isEmpty);
                 if (!targetTile) { checkWin(); break; }
                 await new Promise(resolve => setTimeout(resolve, 80));
                 const targetCorrectPos = targetTile.id;
                 const tileAtTargetPos = tiles.find(t => t.currentPos === targetCorrectPos);
-                
                 if (tileAtTargetPos) {
                     const oldPos = targetTile.currentPos;
                     const newPos = targetCorrectPos;
@@ -323,7 +276,8 @@
                 checkWin();
             }
             isAutoSolving = false;
-            generateBtn.classList.remove('btn-disabled');
+            autoSolveBtn.classList.remove('btn-disabled');
+            selectBtn.classList.remove('btn-disabled');
             shuffleBtn.classList.remove('btn-disabled');
         }
 
@@ -332,24 +286,18 @@
             if (hasWon) {
                 isWon = true;
                 winMsgEl.classList.remove('hidden');
-                statusEl.textContent = "コンプリート！";
+                statusEl.textContent = "完成！";
                 autoSolveBtn.classList.add('btn-disabled');
             }
         }
 
-        document.getElementById('generateBtn').onclick = generateImage;
-        document.getElementById('autoSolveBtn').onclick = autoSolve;
+        autoSolveBtn.onclick = autoSolve;
         document.getElementById('replayBtn').onclick = initGame;
-        document.getElementById('shuffleBtn').onclick = () => {
-            if (currentImgUrl) { initGame(); } else { generateImage(); }
-        };
-        document.getElementById('hintBtn').onclick = () => {
-            if (currentImgUrl) hintModal.classList.remove('hidden');
-        };
+        shuffleBtn.onclick = () => { if (currentImgUrl) initGame(); };
+        hintBtn.onclick = () => { if (currentImgUrl) hintModal.classList.remove('hidden'); };
         document.getElementById('closeHint').onclick = () => { hintModal.classList.add('hidden'); };
         window.onclick = (event) => { if (event.target == hintModal) hintModal.classList.add('hidden'); };
 
-        window.onload = generateImage;
     </script>
 </body>
 </html>
